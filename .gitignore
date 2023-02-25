@@ -1,0 +1,5 @@
+result/
+.vscode
+__pycache__
+.env
+admin.json
