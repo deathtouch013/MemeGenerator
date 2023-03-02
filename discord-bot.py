@@ -38,18 +38,23 @@ BOT = discord.Client(
 # EVENT LISTENER FOR WHEN THE BOT HAS SWITCHED FROM OFFLINE TO ONLINE.
 @BOT.event
 async def on_ready():
-	# CREATES A COUNTER TO KEEP TRACK OF HOW MANY GUILDS / SERVERS THE BOT IS CONNECTED TO.
-	guild_count = 0
+    # CREATES A COUNTER TO KEEP TRACK OF HOW MANY GUILDS / SERVERS THE BOT IS CONNECTED TO.
+    guild_count = 0
 
-	# LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
-	for guild in BOT.guilds:
-		# PRINT THE SERVER'S ID AND NAME.
-		print(f"- {guild.id} (name: {guild.name})")
+    print("READY!")
 
-		guild_count = guild_count + 1
+    # LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
+    for guild in BOT.guilds:
+        # PRINT THE SERVER'S ID AND NAME.
+        print(f"- {guild.id} (name: {guild.name})")
 
-	# PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
-	print("This bot is in " + str(guild_count) + " guilds.")
+        guild_count = guild_count + 1
+
+    # TODO create logger class   https://github.com/xveiga/beekeeler/blob/main/utils/logging.py
+    # tambien es util            https://github.com/xveiga/DawCord
+
+    # PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
+    print("This bot is in " + str(guild_count) + " guilds.")
 
 # event listener for a comand.
 @BOT.event
