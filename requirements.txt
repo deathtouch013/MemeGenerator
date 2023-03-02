@@ -1,3 +1,6 @@
 discord.py
 Pillow
 python-dotenv
+readchar
+requests
+requests-testadapter

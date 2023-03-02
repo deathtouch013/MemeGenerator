@@ -14,10 +14,11 @@ RUN cd /home/discordbot && export PATH=/home/discordbot/.local/bin:$PATH \
     && pip3 install --no-cache-dir --upgrade pip\
     && pip3 install --no-cache-dir --upgrade -r requirements.txt \
     && git remote add upstream https://github.com/deathtouch013/MemeGenerator.git
+    && cp -p docker/hot_reload.sh ./hot_reload.sh
 
 WORKDIR /home/discordbot/MemeGenerator
 
 COPY .env .env
 COPY admin.json admin.json
 #HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD discordhealthcheck || exit 1
-ENTRYPOINT ["/bin/bash","./docker/git-update.sh"]
+ENTRYPOINT ["/bin/bash","./hot_reload.sh"]

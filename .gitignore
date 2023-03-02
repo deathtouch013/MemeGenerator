@@ -3,3 +3,4 @@ result/
 __pycache__
 .env
 admin.json
+hot_reload.sh
