@@ -73,14 +73,11 @@ async def on_message(message):
             return
         if mensaje[1] == "--restart":
             if message.author.id in admins:
-                # If running in docker...
-                if Path('/.dockerenv').is_file():
-                    argv = ["/bin/bash", "./docker/git-update.sh"]
+                if Path('./hot_reload.sh').is_file():
+                    argv = ["/bin/bash", "./hot_reload.sh"]
                     os.execv(argv[0],argv)
                 else:
-                    print("Not implemented. Not running in docker")
-                    # TODO implement
-                    pass
+                    print("hot_reload.sh not found. Maybe you forgot to create or copy it from hot_reload.sh.def?")
             return
         if mensaje[1] == "info" and len(mensaje) >= 3:
             await message.channel.send(meme.info(mensaje[2]))
