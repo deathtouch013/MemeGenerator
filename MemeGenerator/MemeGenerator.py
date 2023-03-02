@@ -12,7 +12,6 @@ LOCAL_URI_PREFIX_LEN = LOCAL_URI_PREFIX.__len__()
 class LocalMemeAdapter(requests.adapters.HTTPAdapter):
     def build_response_from_file(self, request):
         file_path = request.url[LOCAL_URI_PREFIX_LEN:]
-        print(file_path)
         with open(file_path, 'rb') as file:
             buff = bytearray(os.path.getsize(file_path))
             file.readinto(buff)
@@ -126,7 +125,7 @@ class MemeGenerator:
     # @pre: imageID is not None
     def write_image(self, imageID, num_args, l_cadena, l_ancho, l_alto, l_offset_x, l_offset_y, l_rango, l_espaciado):
         imagePath = self.templates.get(imageID)["source"]
-        print(f"write_image Options = " + imagePath)
+        # print(f"write_image Options = " + imagePath)
 
         # Redundant check, imageID is not none
         # if imagePath is None:
@@ -137,8 +136,6 @@ class MemeGenerator:
         img_buf = io.BytesIO(bytes(response.content))
         img = Image.open(img_buf)
 
-        print("Image loaded!")
-
         if num_args != len(l_cadena) or num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y) or num_args != len(l_rango) or num_args != len(l_espaciado):
             raise ValueError("All the list must have the same number of elements")
 
@@ -146,37 +143,58 @@ class MemeGenerator:
         for i in range(num_args):
             if l_cadena[i] == "*":
                 continue
-
             self.write_text(img,l_cadena[i], l_ancho[i], l_alto[i], l_offset_x[i], l_offset_y[i], l_rango[i], l_espaciado[i])
         return img
     
-    def template(self,imageID):
-        print("Not implemented!")
-        return None
-        
-        imagePath = self.images.get(imageID)
+    def template(self,imageID):    
+        imagePath = self.templates.get(imageID)["source"]
+        imageOptions = self.templates.get(imageID)["positionList"]
+
         if imagePath is None:
             raise ValueError("imageID invalid")
-        img = Image.open(imagePath)
-        imageOptions = self.configuration.get(imageID)
-        argmuentos = imageOptions[0]
-        l_ancho = imageOptions[1]
-        l_alto = imageOptions[2]
-        l_offset_x = imageOptions[3]
-        l_offset_y = imageOptions[4]
-        l_rango = imageOptions[5]
-        if argmuentos != len(l_ancho) or argmuentos != len(l_alto) or argmuentos != len(l_offset_x) or argmuentos != len(l_offset_y) or argmuentos != len(l_rango):
+        
+        width_list = []
+        height_list = []
+        offset_x_list = []
+        offset_y_list = []
+        range_list = []
+
+        for key in imageOptions:
+            width_list.append(key["width"])
+            height_list.append(key["height"])
+            offset_x_list.append(key["x"])
+            offset_y_list.append(key["y"])
+            range_list.append(key["sizeRange"])
+
+        # Load from http request
+        response = self.requests_session.get(imagePath, stream=True, allow_redirects=True, headers={'Accept-Encoding': ''})
+        img_buf = io.BytesIO(bytes(response.content))
+        img = Image.open(img_buf)
+
+        num_args = len(imageOptions)
+        l_ancho = width_list
+        l_alto = height_list
+        l_offset_x = offset_x_list
+        l_offset_y = offset_y_list
+        l_rango = range_list
+        
+        if num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y):
             raise ValueError("All the list must have the same number of elements")
+
         draw = ImageDraw.Draw(img,'RGBA')
-        for i in range(argmuentos):
-            draw.rectangle((l_offset_x[i], l_offset_y[i],l_offset_x[i] + l_ancho[i],l_offset_y[i] + l_alto[i]),fill=(0,0,0,125), outline=(255, 255, 255))
-            font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=l_rango[i][1])
-            draw.text((l_offset_x[i] + (l_ancho[i]/2), l_offset_y[i] + (l_alto[i]/4)), str(i+1), font=font, fill=(255,255,255), stroke_width=3, stroke_fill='black')
+        # FIXME restar ancho del número / 2 para centrarlo en el offset correcto
+        for (idx, (offset_x, offset_y, width, height, range)) in enumerate(zip(l_offset_x, l_offset_y, l_ancho, l_alto, l_rango), 1):
+            draw.rectangle((offset_x, offset_y, offset_x+width, offset_y+height), fill=(0,0,0,125), outline=(255,255,255))
+            font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=max(range))
+            draw.text((offset_x + (width/2), offset_y + (height/4)), str(idx), font=font, fill=(255,255,255), stroke_width=3, stroke_fill='black')
         return img
 
     def makeMeme(self, imageID, l_cadena):
         imageOptions = self.templates.get(imageID)["positionList"]
-        print(f"makeMeme Options = {imageOptions}")
+        # print(f"makeMeme Options = {imageOptions}")
+
+        if imageOptions is None:
+            raise ValueError("imageID invalid")
 
         width_list = []
         height_list = []
@@ -193,16 +211,13 @@ class MemeGenerator:
             range_list.append(key["sizeRange"])
             spacing_list.append(key["lineSpacing"])
         
-        if imageOptions is None:
-            raise ValueError("imageID invalid")
-        
         return self.write_image(imageID=imageID, num_args=len(imageOptions), l_cadena=l_cadena, l_ancho=width_list, l_alto=height_list, l_offset_x=offset_x_list, l_offset_y=offset_y_list, l_rango=range_list, l_espaciado=spacing_list)
 
     def help(self):
         title = "Meme Generator Commands"
-        commands = ["info", "list", "create"]
-        params = ["imageID", None, "imageID <strings>"]
-        descriptions = ["Returns the number of strings that the imageID can take", "Returns the list of available imageIDs", "Creates a meme with the given imageID and the given strings, the strings must be separated by \';\'"]
+        commands = ["info", "list", "create", "template"]
+        params = ["imageID", None, "imageID <strings>", "imageID"]
+        descriptions = ["Returns the number of strings that the imageID can take", "Returns the list of available imageIDs", "Creates a meme with the given imageID and the given strings, the strings must be separated by \';\'", "Returns a template of the given imageID"]
 
         return (title, commands, params, descriptions)
 
@@ -216,7 +231,7 @@ class MemeGenerator:
         if imageOptions is None:
             return "Thats not a valid imageID!"
 
-        return f"Format: `!meme create {imageID} {';'.join([f' string{i} ' for i in range(len(imageOptions))])}`"
+        return f"Format: `!meme create {imageID}{';'.join([f' str{i} ' for i in range(1, len(imageOptions)+1)])[:-1]}`"
     
     def saveMeme(self, imageID, l_cadena, path):
         img = self.makeMeme(imageID,l_cadena)
