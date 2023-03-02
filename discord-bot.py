@@ -1,33 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import discord
 import os
-from dotenv import load_dotenv
+import dotenv
 from MemeGenerator.MemeGenerator import MemeGenerator
 import io
 import json
 
-# LOADS THE .ENV FILE THAT RESIDES ON THE SAME LEVEL AS THE SCRIPT.
-load_dotenv()
-
-# GRAB THE API TOKEN FROM THE .ENV FILE.
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-meme = MemeGenerator()
-
-admins = json.load(open('admin.json'))
-
-description = """
-Hello! I am a bot.
-"""
+description = "Hello! I am a bot."
 intents = discord.Intents(
-            guilds=True,
-            members=True,
-            bans=True,
-            emojis=True,
-            voice_states=True,
-            messages=True,
-            reactions=True,
-            message_content=True,
-        )
+    guilds=True,
+    members=True,
+    bans=True,
+    emojis=True,
+    voice_states=True,
+    messages=True,
+    reactions=True,
+    message_content=True,
+)
+
 # GETS THE CLIENT OBJECT FROM DISCORD.PY. CLIENT IS SYNONYMOUS WITH BOT.
 bot = discord.Client(
     command_prefix=None,
@@ -100,5 +92,15 @@ async def on_message(message):
             await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
     
 
-# EXECUTES THE BOT WITH THE SPECIFIED TOKEN. TOKEN HAS BEEN REMOVED AND USED JUST AS AN EXAMPLE.
-bot.run(DISCORD_TOKEN)
+if __name__ == "__main__":
+    # LOADS THE .ENV FILE THAT RESIDES ON THE SAME LEVEL AS THE SCRIPT.
+    dotenv.load_dotenv()
+
+    # GRAB THE API TOKEN FROM THE .ENV FILE.
+    DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+    meme = MemeGenerator()
+
+    admins = json.load(open('admin.json'))
+
+    # EXECUTES THE BOT WITH THE SPECIFIED TOKEN. TOKEN HAS BEEN REMOVED AND USED JUST AS AN EXAMPLE.
+    bot.run(DISCORD_TOKEN)
