@@ -1,0 +1,683 @@
+{
+    "shoot": {
+        "positionList": [
+            {
+                "width": 560,
+                "height": 201,
+                "x": 97,
+                "y": 869,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Billy!-What-Have-You-Done.jpg"
+    },
+    "facts": {
+        "positionList": [
+            {
+                "width": 1276,
+                "height": 914,
+                "x": 63,
+                "y": 2077,
+                "sizeRange": [
+                    10,
+                    400
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Facts.jpg"
+    },
+    "xmas": {
+        "positionList": [
+            {
+                "width": 176,
+                "height": 74,
+                "x": 149,
+                "y": 347,
+                "sizeRange": [
+                    10,
+                    70
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/i_want_a_dragon_for_christmas.jpg"
+    },
+    "paper-burn": {
+        "positionList": [
+            {
+                "width": 275,
+                "height": 388,
+                "x": 253,
+                "y": 133,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Spongebob-burn-paper.jpg"
+    },
+    "sleep": {
+        "positionList": [
+            {
+                "width": 809,
+                "height": 252,
+                "x": 55,
+                "y": 903,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Are-You-Going-To-Sleep.jpg"
+    },
+    "rabbit": {
+        "positionList": [
+            {
+                "width": 370,
+                "height": 481,
+                "x": 301,
+                "y": 815,
+                "sizeRange": [
+                    10,
+                    150
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 684,
+                "height": 303,
+                "x": 525,
+                "y": 1564,
+                "sizeRange": [
+                    10,
+                    150
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/children-scared-rabbit.jpg"
+    },
+    "cat-waffle": {
+        "positionList": [
+            {
+                "width": 600,
+                "height": 464,
+                "x": 195,
+                "y": 310,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 395,
+                "height": 443,
+                "x": 1088,
+                "y": 387,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/cat-Waffle.jpg"
+    },
+    "giant": {
+        "positionList": [
+            {
+                "width": 712,
+                "height": 482,
+                "x": 288,
+                "y": 302,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 675,
+                "height": 356,
+                "x": 81,
+                "y": 1394,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/dark-souls-giant.jpg"
+    },
+    "lick": {
+        "positionList": [
+            {
+                "width": 198,
+                "height": 234,
+                "x": 82,
+                "y": 74,
+                "sizeRange": [
+                    10,
+                    40
+                ],
+                "lineSpacing": 4
+            },
+            {
+                "width": 173,
+                "height": 208,
+                "x": 348,
+                "y": 100,
+                "sizeRange": [
+                    10,
+                    40
+                ],
+                "lineSpacing": 4
+            }
+        ],
+        "source": "meme://./templates/cinnamon-toaster-lick-720.jpg"
+    },
+    "jojo": {
+        "positionList": [
+            {
+                "width": 739,
+                "height": 410,
+                "x": 163,
+                "y": 450,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 441,
+                "height": 402,
+                "x": 1105,
+                "y": 407,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Dio-vs-Jotaro.jpg"
+    },
+    "doge": {
+        "positionList": [
+            {
+                "width": 994,
+                "height": 816,
+                "x": 391,
+                "y": 393,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 843,
+                "height": 624,
+                "x": 1537,
+                "y": 51,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/swole-doge-and-cheems.jpg"
+    },
+    "explain": {
+        "positionList": [
+            {
+                "width": 382,
+                "height": 695,
+                "x": 334,
+                "y": 14,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 668,
+                "height": 187,
+                "x": 760,
+                "y": 32,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Trying-to-explain.jpg"
+    },
+    "trap": {
+        "positionList": [
+            {
+                "width": 338,
+                "height": 297,
+                "x": 640,
+                "y": 534,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 426,
+                "height": 442,
+                "x": 16,
+                "y": 343,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Grandma-hiding-knife-from-rabbit.jpg"
+    },
+    "tape": {
+        "positionList": [
+            {
+                "width": 970,
+                "height": 566,
+                "x": 1947,
+                "y": 623,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 2101,
+                "height": 947,
+                "x": 927,
+                "y": 2174,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Flex-tape.jpg"
+    },
+    "untape": {
+        "positionList": [
+            {
+                "width": 393,
+                "height": 200,
+                "x": 939,
+                "y": 243,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 954,
+                "height": 353,
+                "x": 394,
+                "y": 954,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Flex-untape.jpg"
+    },
+    "castles": {
+        "positionList": [
+            {
+                "width": 835,
+                "height": 704,
+                "x": 566,
+                "y": 307,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 4
+            },
+            {
+                "width": 852,
+                "height": 641,
+                "x": 2758,
+                "y": 378,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 4
+            }
+        ],
+        "source": "meme://./templates/dramatic-crossroads.jpg"
+    },
+    "funeral": {
+        "positionList": [
+            {
+                "width": 618,
+                "height": 678,
+                "x": 428,
+                "y": 912,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 941,
+                "height": 1341,
+                "x": 1715,
+                "y": 1481,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Tombe-funerals-chek.jpg"
+    },
+    "one-button": {
+        "positionList": [
+            {
+                "width": 914,
+                "height": 361,
+                "x": 107,
+                "y": 183,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 850,
+                "height": 381,
+                "x": 1051,
+                "y": 1880,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Daily-Struggle-Dr.-Eggman.jpg"
+    },
+    "two-button": {
+        "positionList": [
+            {
+                "width": 218,
+                "height": 124,
+                "x": 33,
+                "y": 49,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 200,
+                "height": 101,
+                "x": 309,
+                "y": 28,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 468,
+                "height": 146,
+                "x": 80,
+                "y": 695,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Two-Buttons.jpg"
+    },
+    "turn": {
+        "positionList": [
+            {
+                "width": 146,
+                "height": 213,
+                "x": 225,
+                "y": 113,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 207,
+                "height": 211,
+                "x": 494,
+                "y": 113,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 403,
+                "height": 197,
+                "x": 261,
+                "y": 626,
+                "sizeRange": [
+                    10,
+                    100
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/cambio-de-direccion.jpg"
+    },
+    "lick-stab": {
+        "positionList": [
+            {
+                "width": 146,
+                "height": 86,
+                "x": 221,
+                "y": 319,
+                "sizeRange": [
+                    10,
+                    40
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 146,
+                "height": 65,
+                "x": 407,
+                "y": 243,
+                "sizeRange": [
+                    10,
+                    40
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 101,
+                "height": 147,
+                "x": 656,
+                "y": 269,
+                "sizeRange": [
+                    10,
+                    40
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/cinamon-toast-stab-lick.jpg"
+    },
+    "tea": {
+        "positionList": [
+            {
+                "width": 758,
+                "height": 261,
+                "x": 102,
+                "y": 75,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 609,
+                "height": 296,
+                "x": 125,
+                "y": 609,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 650,
+                "height": 321,
+                "x": 1394,
+                "y": 1600,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Chaeyoung-Drinking.jpg"
+    },
+    "better": {
+        "positionList": [
+            {
+                "width": 584,
+                "height": 357,
+                "x": 493,
+                "y": 147,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 298,
+                "height": 142,
+                "x": 160,
+                "y": 961,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 288,
+                "height": 138,
+                "x": 542,
+                "y": 938,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 293,
+                "height": 146,
+                "x": 876,
+                "y": 914,
+                "sizeRange": [
+                    10,
+                    250
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/Griffin-familly-guy--Better-than-me.jpg"
+    },
+    "drowning": {
+        "positionList": [
+            {
+                "width": 621,
+                "height": 383,
+                "x": 1201,
+                "y": 561,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 506,
+                "height": 255,
+                "x": 549,
+                "y": 329,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 740,
+                "height": 412,
+                "x": 94,
+                "y": 808,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            },
+            {
+                "width": 588,
+                "height": 524,
+                "x": 731,
+                "y": 1768,
+                "sizeRange": [
+                    10,
+                    200
+                ],
+                "lineSpacing": 2
+            }
+        ],
+        "source": "meme://./templates/pool-kid-Drowning-skeleton.jpg"
+    }
+}
