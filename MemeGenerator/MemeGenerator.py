@@ -1,5 +1,6 @@
 import json
 from PIL import Image, ImageDraw, ImageFont
+import itertools
 
 
 class MemeGenerator:
@@ -115,30 +116,15 @@ class MemeGenerator:
         return self.write_image(imageID, imageOptions[0], l_cadena, imageOptions[1], imageOptions[2], imageOptions[3], imageOptions[4], imageOptions[5], imageOptions[6])
 
     def help(self):
-        str = """Uso del comando asumiendo que meme es el nombre del ejecutable:
-        meme IMAGEID [-o PATH] TEXTO1 [; TEXTO2; TEXTO3;...]
-Los diferentos textos deben ir separados por ';' con espacios por ambos lados. Si va como 'ejemplo;' o ';ejemplo' no sera detectada.
-Donde IMAGEID puede tomar los valores siguientes:
+        title = "Meme Generator Commands"
+        commands = ["info", "list", "create"]
+        params = ["imageID", None, "imageID <strings>"]
+        descriptions = ["Returns the number of strings that the imageID can take", "Returns the list of available imageIDs", "Creates a meme with the given imageID and the given strings, the strings must be separated by \';\'"]
 
-        """
-        for i in self.images.keys():
-            str = str + i + ", "
-        str = str[:-2] + "\n"
+        return (title, commands, params, descriptions)
 
-        return str
-
-    def helpDiscord(self):
-        str = """Uso del comando asumiendo que meme es el nombre del ejecutable:
-        meme IMAGEID TEXTO1 [; TEXTO2; TEXTO3;...]
-Los diferentos textos deben ir separados por ';' con espacios por ambos lados. Si va como 'ejemplo;' o ';ejemplo' no sera detectada.
-Donde IMAGEID puede tomar los valores siguientes:
-
-        """
-        for i in self.images.keys():
-            str = str + i + ", "
-        str = str[:-2] + "\n"
-
-        return str
+    def listAvail(self):
+        return ", ".join(self.images.keys())
     
     def info(self,imageID):
         arguments = self.configuration.get(imageID)

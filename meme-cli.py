@@ -7,6 +7,7 @@ path = "./result/meme-generado.png"
 StringsBegin = 2
 if sys.argv[1] == "-h" or sys.argv[1] == "--help":
     print(meme.help)
+    # todo refactor
     exit
 
 if nargv >= 4 and sys.argv[2] == "-o":

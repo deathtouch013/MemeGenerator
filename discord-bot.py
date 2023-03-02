@@ -64,14 +64,18 @@ async def on_message(message):
         return
     mensaje = message.content.split()
     if mensaje[0] == "!meme":
-        if mensaje[1] == "-h" or mensaje[1] == "--help":
-            await message.channel.send(meme.helpDiscord())
+        if mensaje[1] == "help":
+            (title, commands, params, descriptions) = meme.help()
+
+            description = "\n".join([f"`{command} {param}` - {description}" for command, param, description in zip(commands, params, descriptions)])
+
+            await message.channel.send(embed=discord.Embed(title=title, description=description, color=0x00ff00))
             return
-        if mensaje[1] == "-r" or mensaje[1] == "--reload":
+        if mensaje[1] == "reload":
             if message.author.id in admins:
                 meme.reload()
             return
-        if mensaje[1] == "--restart":
+        if mensaje[1] == "restart":
             if message.author.id in admins:
                 if Path('./hot_reload.sh').is_file():
                     argv = ["/bin/bash", "./hot_reload.sh"]
@@ -82,25 +86,29 @@ async def on_message(message):
         if mensaje[1] == "info" and len(mensaje) >= 3:
             await message.channel.send(meme.info(mensaje[2]))
             return
-        strings = []
-        aux = ""
-        for i in mensaje[2:]:
-            if i == ";":
-                strings.append(aux[:-1])
-                aux = ""
-                continue
-            aux = aux + i + " "
-        strings.append(aux[:-1])
-        try:
-            img = meme.makeMeme(mensaje[1],strings)
-        except Exception as e:
-            await message.channel.send(e)
+        if mensaje[1] == "list":
+            await message.channel.send(meme.list())
             return
-        with io.BytesIO() as image_binary:
-            img.save(image_binary, 'PNG')
-            image_binary.seek(0)
-            await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
-    
+        if mensaje[1] == "create":
+            strings = []
+            aux = ""
+            for i in mensaje[3:]:
+                if i == ";":
+                    strings.append(aux[:-1])
+                    aux = ""
+                    continue
+                aux = aux + i + " "
+            strings.append(aux[:-1])
+            try:
+                img = meme.makeMeme(mensaje[2],strings)
+            except Exception as e:
+                await message.channel.send(e)
+                return
+            with io.BytesIO() as image_binary:
+                img.save(image_binary, 'PNG')
+                image_binary.seek(0)
+                await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
+        
 
 if __name__ == "__main__":
     # Register the signal handlers
