@@ -7,9 +7,11 @@ import dotenv
 from MemeGenerator.MemeGenerator import MemeGenerator
 import io
 import json
+import signal
+import utils
 
-description = "Hello! I am a bot."
-intents = discord.Intents(
+DESCRIPTION = "Hello! I am a bot."
+INTENTS = discord.Intents(
     guilds=True,
     members=True,
     bans=True,
@@ -21,26 +23,26 @@ intents = discord.Intents(
 )
 
 # GETS THE CLIENT OBJECT FROM DISCORD.PY. CLIENT IS SYNONYMOUS WITH BOT.
-bot = discord.Client(
+BOT = discord.Client(
     command_prefix=None,
-    description=description,
+    description=DESCRIPTION,
     pm_help=None,
     help_attrs=dict(hidden=True),
     chunk_guilds_at_startup=False,
     heartbeat_timeout=150.0,
     allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
-    intents=intents,
+    intents=INTENTS,
     enable_debug_events=True,
 )
 
 # EVENT LISTENER FOR WHEN THE BOT HAS SWITCHED FROM OFFLINE TO ONLINE.
-@bot.event
+@BOT.event
 async def on_ready():
 	# CREATES A COUNTER TO KEEP TRACK OF HOW MANY GUILDS / SERVERS THE BOT IS CONNECTED TO.
 	guild_count = 0
 
 	# LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
-	for guild in bot.guilds:
+	for guild in BOT.guilds:
 		# PRINT THE SERVER'S ID AND NAME.
 		print(f"- {guild.id} (name: {guild.name})")
 
@@ -50,7 +52,7 @@ async def on_ready():
 	print("This bot is in " + str(guild_count) + " guilds.")
 
 # event listener for a comand.
-@bot.event
+@BOT.event
 async def on_message(message):
     if message.author.bot:
         return
@@ -93,6 +95,9 @@ async def on_message(message):
     
 
 if __name__ == "__main__":
+    # Register the signal handlers
+    signal.signal(signal.SIGINT, utils.sigint_handler)
+
     # LOADS THE .ENV FILE THAT RESIDES ON THE SAME LEVEL AS THE SCRIPT.
     dotenv.load_dotenv()
 
@@ -103,4 +108,4 @@ if __name__ == "__main__":
     admins = json.load(open('admin.json'))
 
     # EXECUTES THE BOT WITH THE SPECIFIED TOKEN. TOKEN HAS BEEN REMOVED AND USED JUST AS AN EXAMPLE.
-    bot.run(DISCORD_TOKEN)
+    BOT.run(DISCORD_TOKEN)
