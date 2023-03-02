@@ -9,6 +9,7 @@ import io
 import json
 import signal
 import utils
+from pathlib import Path
 
 DESCRIPTION = "Hello! I am a bot."
 INTENTS = discord.Intents(
@@ -72,9 +73,14 @@ async def on_message(message):
             return
         if mensaje[1] == "--restart":
             if message.author.id in admins:
-                #os.system("git-update.sh")
-                argv = ["/bin/bash", "./docker/git-update.sh"]
-                os.execv(argv[0],argv)
+                # If running in docker...
+                if Path('/.dockerenv').is_file():
+                    argv = ["/bin/bash", "./docker/git-update.sh"]
+                    os.execv(argv[0],argv)
+                else:
+                    print("Not implemented. Not running in docker")
+                    # TODO implement
+                    pass
             return
         if mensaje[1] == "info" and len(mensaje) >= 3:
             await message.channel.send(meme.info(mensaje[2]))
