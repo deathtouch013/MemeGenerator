@@ -85,9 +85,10 @@ async def on_message(message):
             return
         if mensaje[1] == "info" and len(mensaje) >= 3:
             await message.channel.send(meme.info(mensaje[2]))
+            # TODO añadir recuadro con imagenes en blanco
             return
         if mensaje[1] == "list":
-            await message.channel.send(meme.list())
+            await message.channel.send(meme.listAvail())
             return
         if mensaje[1] == "create":
             strings = []

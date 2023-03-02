@@ -1,16 +1,41 @@
 import json
 from PIL import Image, ImageDraw, ImageFont
 import itertools
+import os
+import io
+import requests
+from requests_testadapter import Resp
 
+LOCAL_URI_PREFIX = 'meme://'
+LOCAL_URI_PREFIX_LEN = LOCAL_URI_PREFIX.__len__()
+
+class LocalMemeAdapter(requests.adapters.HTTPAdapter):
+    def build_response_from_file(self, request):
+        file_path = request.url[LOCAL_URI_PREFIX_LEN:]
+        print(file_path)
+        with open(file_path, 'rb') as file:
+            buff = bytearray(os.path.getsize(file_path))
+            file.readinto(buff)
+            resp = Resp(buff)
+            r = self.build_response(request, resp)
+
+            return r
+
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):
+        return self.build_response_from_file(request)
 
 class MemeGenerator:
-    imagesPath = './MemeGenerator/images.json'
-    images = json.load(open(imagesPath))
-    configPath = './MemeGenerator/configuration.json'
-    #orden: numero de argumentos, ancho, alto, offset_x, offset_y, rango de tamaño de letra, espaciado entre lineas
-    configuration = json.load(open(configPath))
-    fontsPath = './MemeGenerator/fonts.json'
-    fonts = json.load(open(fontsPath))
+
+    def __init__(self):
+        self.templatesPath = os.path.abspath('./MemeGenerator/templates.json')
+        self.templates = json.load(open(self.templatesPath))
+
+        self.fontsPath = os.path.abspath('./MemeGenerator/fonts.json')
+        self.fonts = json.load(open(self.fontsPath))
+
+        # Register session
+        self.requests_session = requests.Session()
+        self.requests_session.mount('meme://', LocalMemeAdapter())
 
     def break_fix(self, text, width, font, draw):
         if not text:
@@ -98,22 +123,51 @@ class MemeGenerator:
         self.fit_text(img, cadena, (255,255,255), arial, ancho, alto,  offset_x, offset_y, espaciado)
         return img
     
-    def write_image(self, imageID, argmuentos, l_cadena, l_ancho, l_alto, l_offset_x, l_offset_y, l_rango, l_espaciado):
-        imagePath = self.images.get(imageID)
-        if imagePath is None:
-            raise ValueError("imageID invalid")
-        img = Image.open(imagePath)
-        if argmuentos != len(l_cadena) or argmuentos != len(l_ancho) or argmuentos != len(l_alto) or argmuentos != len(l_offset_x) or argmuentos != len(l_offset_y) or argmuentos != len(l_rango) or argmuentos != len(l_espaciado):
+    # @pre: imageID is not None
+    def write_image(self, imageID, num_args, l_cadena, l_ancho, l_alto, l_offset_x, l_offset_y, l_rango, l_espaciado):
+        imagePath = self.templates.get(imageID)["source"]
+        print(f"write_image Options = " + imagePath)
+
+        # Redundant check, imageID is not none
+        # if imagePath is None:
+        #     raise ValueError("imageID invalid")
+
+        # Load from http request
+        response = self.requests_session.get(imagePath, stream=True, allow_redirects=True, headers={'Accept-Encoding': ''})
+        img_buf = io.BytesIO(bytes(response.content))
+        img = Image.open(img_buf)
+
+        print("Image loaded!")
+
+        if num_args != len(l_cadena) or num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y) or num_args != len(l_rango) or num_args != len(l_espaciado):
             raise ValueError("All the list must have the same number of elements")
-        for i in range(argmuentos):
+        for i in range(num_args):
             self.write_text(img,l_cadena[i], l_ancho[i], l_alto[i], l_offset_x[i], l_offset_y[i], l_rango[i], l_espaciado[i])
         return img
     
     def makeMeme(self, imageID, l_cadena):
-        imageOptions = self.configuration.get(imageID)
+        imageOptions = self.templates.get(imageID)["positionList"]
+        print(f"makeMeme Options = {imageOptions}")
+
+        width_list = []
+        height_list = []
+        offset_x_list = []
+        offset_y_list = []
+        range_list = []
+        spacing_list = []
+
+        for key in imageOptions:
+            width_list.append(key["width"])
+            height_list.append(key["height"])
+            offset_x_list.append(key["x"])
+            offset_y_list.append(key["y"])
+            range_list.append(key["sizeRange"])
+            spacing_list.append(key["lineSpacing"])
+        
         if imageOptions is None:
             raise ValueError("imageID invalid")
-        return self.write_image(imageID, imageOptions[0], l_cadena, imageOptions[1], imageOptions[2], imageOptions[3], imageOptions[4], imageOptions[5], imageOptions[6])
+        
+        return self.write_image(imageID=imageID, num_args=len(imageOptions), l_cadena=l_cadena, l_ancho=width_list, l_alto=height_list, l_offset_x=offset_x_list, l_offset_y=offset_y_list, l_rango=range_list, l_espaciado=spacing_list)
 
     def help(self):
         title = "Meme Generator Commands"
@@ -124,19 +178,20 @@ class MemeGenerator:
         return (title, commands, params, descriptions)
 
     def listAvail(self):
-        return ", ".join(self.images.keys())
+        # Todo make an embed
+        return ", ".join(self.templates.keys())
     
     def info(self,imageID):
-        arguments = self.configuration.get(imageID)
-        if arguments is None:
-            return "Thats not a imageID"
-        return "The number of strings is " + str(arguments[0])
+        imageOptions = self.templates.get(imageID)["positionList"]
+        
+        if imageOptions is None:
+            return "Thats not a valid imageID!"
+
+        return f"Format: `!meme create {imageID} {';'.join([f' string{i} ' for i in range(len(imageOptions))])}`"
     
     def saveMeme(self, imageID, l_cadena, path):
         img = self.makeMeme(imageID,l_cadena)
         img.save(path)
     
     def reload(self):
-        self.images = json.load(open(self.imagesPath))
-        self.configuration = json.load(open(self.configPath))
-        self.fonts = json.load(open(self.fontsPath)) 
+        self.__init__()

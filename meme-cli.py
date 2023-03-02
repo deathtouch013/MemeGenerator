@@ -14,7 +14,6 @@ if nargv >= 4 and sys.argv[2] == "-o":
     path = sys.argv[3]
     StringsBegin = 4
 
-
 if sys.argv[1] == "info" and nargv == 3:
     print(meme.info(sys.argv[2]))
 
