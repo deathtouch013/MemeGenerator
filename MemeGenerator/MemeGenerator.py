@@ -141,10 +141,39 @@ class MemeGenerator:
 
         if num_args != len(l_cadena) or num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y) or num_args != len(l_rango) or num_args != len(l_espaciado):
             raise ValueError("All the list must have the same number of elements")
+
+        # Set * as a placeholder for no text
         for i in range(num_args):
+            if l_cadena[i] == "*":
+                continue
+
             self.write_text(img,l_cadena[i], l_ancho[i], l_alto[i], l_offset_x[i], l_offset_y[i], l_rango[i], l_espaciado[i])
         return img
     
+    def template(self,imageID):
+        print("Not implemented!")
+        return None
+        
+        imagePath = self.images.get(imageID)
+        if imagePath is None:
+            raise ValueError("imageID invalid")
+        img = Image.open(imagePath)
+        imageOptions = self.configuration.get(imageID)
+        argmuentos = imageOptions[0]
+        l_ancho = imageOptions[1]
+        l_alto = imageOptions[2]
+        l_offset_x = imageOptions[3]
+        l_offset_y = imageOptions[4]
+        l_rango = imageOptions[5]
+        if argmuentos != len(l_ancho) or argmuentos != len(l_alto) or argmuentos != len(l_offset_x) or argmuentos != len(l_offset_y) or argmuentos != len(l_rango):
+            raise ValueError("All the list must have the same number of elements")
+        draw = ImageDraw.Draw(img,'RGBA')
+        for i in range(argmuentos):
+            draw.rectangle((l_offset_x[i], l_offset_y[i],l_offset_x[i] + l_ancho[i],l_offset_y[i] + l_alto[i]),fill=(0,0,0,125), outline=(255, 255, 255))
+            font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=l_rango[i][1])
+            draw.text((l_offset_x[i] + (l_ancho[i]/2), l_offset_y[i] + (l_alto[i]/4)), str(i+1), font=font, fill=(255,255,255), stroke_width=3, stroke_fill='black')
+        return img
+
     def makeMeme(self, imageID, l_cadena):
         imageOptions = self.templates.get(imageID)["positionList"]
         print(f"makeMeme Options = {imageOptions}")

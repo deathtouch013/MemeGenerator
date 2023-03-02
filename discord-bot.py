@@ -87,6 +87,17 @@ async def on_message(message):
             await message.channel.send(meme.info(mensaje[2]))
             # TODO añadir recuadro con imagenes en blanco
             return
+        if mensaje[1] == "template" and len(mensaje) >= 3:
+            try:
+                img = meme.template(mensaje[2])
+            except ValueError as e:
+                await message.channel.send(e)
+                return
+            with io.BytesIO() as image_binary:
+                img.save(image_binary, 'PNG')
+                image_binary.seek(0)
+                await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
+            return
         if mensaje[1] == "list":
             await message.channel.send(meme.listAvail())
             return
