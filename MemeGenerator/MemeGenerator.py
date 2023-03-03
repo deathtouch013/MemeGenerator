@@ -1,17 +1,79 @@
 import json
 from PIL import Image, ImageDraw, ImageFont
+import os
+import io
+import requests
+from requests_testadapter import Resp
 
+LOCAL_URI_PREFIX = 'meme://'
+LOCAL_URI_PREFIX_LEN = LOCAL_URI_PREFIX.__len__()
+
+class LocalMemeAdapter(requests.adapters.HTTPAdapter):
+    def build_response_from_file(self, request):
+        file_path = request.url[LOCAL_URI_PREFIX_LEN:]
+        with open(file_path, 'rb') as file:
+            buff = bytearray(os.path.getsize(file_path))
+            file.readinto(buff)
+            resp = Resp(buff)
+            r = self.build_response(request, resp)
+
+            return r
+
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):
+        return self.build_response_from_file(request)
 
 class MemeGenerator:
-    imagesPath = './MemeGenerator/images.json'
-    images = json.load(open(imagesPath))
-    configPath = './MemeGenerator/configuration.json'
-    #orden: numero de argumentos, ancho, alto, offset_x, offset_y, rango de tamaño de letra, espaciado entre lineas
-    configuration = json.load(open(configPath))
-    fontsPath = './MemeGenerator/fonts.json'
-    fonts = json.load(open(fontsPath))
+
+    def __init__(self):
+        self.templatesPath = os.path.abspath('./MemeGenerator/templates.json')
+        self.templates = json.load(open(self.templatesPath))
+
+        self.fontsPath = os.path.abspath('./MemeGenerator/fonts.json')
+        self.fonts = json.load(open(self.fontsPath))
+
+        # Register session
+        self.requests_session = requests.Session()
+        self.requests_session.mount('meme://', LocalMemeAdapter())
+
+    def ComprobacionFitText(self, img, cadena, Font, ancho, alto):
+        try:
+            self.try_fit_text(img, cadena, Font, ancho, alto)
+        except:
+            return False
+        return True
+
+    def busquedaBinaria(self, rango, img, cadena, ancho, alto):
+        """Búsqueda binaria
+        Precondición: lista está ordenada
+        Devuelve -1 si x no está en lista;
+        Devuelve p tal que lista[p] == x, si x está en lista
+        """
+
+        izq = rango[0] # izq guarda el índice inicio del segmento
+        der = rango[1] # der guarda el índice fin del segmento
+
+        # un segmento es vacío cuando izq > der:
+        while izq <= der:
+            # el punto medio del segmento
+            medio = (izq+der)//2
+            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=medio)
+            if izq == der:
+                break
+            elif self.ComprobacionFitText(img, cadena, Font, ancho, alto):
+                izq = medio+1
+            else:
+                der = medio-1
+        if self.ComprobacionFitText(img, cadena, Font, ancho, alto):
+            return medio
+        else:
+            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=(medio-1))
+            if self.ComprobacionFitText(img, cadena, Font, ancho, alto) and ((medio-1) >= rango[0]):
+                return medio -1
+        # salió del ciclo de manera no exitosa: el valor no fue encontrado
+        return -1
 
     def break_fix(self, text, width, font, draw):
+        #TODO aplicar busqueda binaria
         if not text:
             return
         lo = 0
@@ -83,74 +145,124 @@ class MemeGenerator:
             raise ValueError("text doesn't fit")
 
     def write_text(self, img, cadena, ancho, alto, offset_x, offset_y, rango, espaciado):
-        #TODO optimizar con busqueda binaria
-        for size in range(rango[0], rango[1]):
-            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=size)
-            try:
-                self.try_fit_text(img, cadena, Font, ancho, alto)
-            except:
-                break
-                
-            selected_size = size
 
+        selected_size = self.busquedaBinaria(rango,img, cadena, ancho, alto)
+
+        if(selected_size == -1):
+            raise ValueError("text doesn't fit")
         arial = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=selected_size)
         self.fit_text(img, cadena, (255,255,255), arial, ancho, alto,  offset_x, offset_y, espaciado)
         return img
     
-    def write_image(self, imageID, argmuentos, l_cadena, l_ancho, l_alto, l_offset_x, l_offset_y, l_rango, l_espaciado):
-        imagePath = self.images.get(imageID)
-        if imagePath is None:
-            raise ValueError("imageID invalid")
-        img = Image.open(imagePath)
-        if argmuentos != len(l_cadena) or argmuentos != len(l_ancho) or argmuentos != len(l_alto) or argmuentos != len(l_offset_x) or argmuentos != len(l_offset_y) or argmuentos != len(l_rango) or argmuentos != len(l_espaciado):
+    # @pre: imageID is not None
+    def write_image(self, imageID, num_args, l_cadena, l_ancho, l_alto, l_offset_x, l_offset_y, l_rango, l_espaciado):
+        imagePath = self.templates.get(imageID)["source"]
+        # print(f"write_image Options = " + imagePath)
+
+        # Redundant check, imageID is not none
+        # if imagePath is None:
+        #     raise ValueError("imageID invalid")
+
+        # Load from http request
+        response = self.requests_session.get(imagePath, stream=True, allow_redirects=True, headers={'Accept-Encoding': ''})
+        img_buf = io.BytesIO(bytes(response.content))
+        img = Image.open(img_buf)
+
+        if num_args != len(l_cadena) or num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y) or num_args != len(l_rango) or num_args != len(l_espaciado):
             raise ValueError("All the list must have the same number of elements")
-        for i in range(argmuentos):
+
+        # Set * as a placeholder for no text
+        for i in range(num_args):
+            if l_cadena[i] == "*":
+                continue
             self.write_text(img,l_cadena[i], l_ancho[i], l_alto[i], l_offset_x[i], l_offset_y[i], l_rango[i], l_espaciado[i])
         return img
     
+    def template(self,imageID):    
+        imagePath = self.templates.get(imageID)["source"]
+        imageOptions = self.templates.get(imageID)["positionList"]
+
+        if imagePath is None:
+            raise ValueError("imageID invalid")
+        
+        width_list = []
+        height_list = []
+        offset_x_list = []
+        offset_y_list = []
+        range_list = []
+
+        for key in imageOptions:
+            width_list.append(key["width"])
+            height_list.append(key["height"])
+            offset_x_list.append(key["x"])
+            offset_y_list.append(key["y"])
+            range_list.append(key["sizeRange"])
+
+        # Load from http request
+        response = self.requests_session.get(imagePath, stream=True, allow_redirects=True, headers={'Accept-Encoding': ''})
+        img_buf = io.BytesIO(bytes(response.content))
+        img = Image.open(img_buf)
+
+        num_args = len(imageOptions)
+        
+        if num_args != len(width_list) or num_args != len(height_list) or num_args != len(offset_x_list) or num_args != len(offset_y_list):
+            raise ValueError("All the list must have the same number of elements")
+
+        draw = ImageDraw.Draw(img,'RGBA')
+        # FIXME restar ancho del número / 2 para centrarlo en el offset correcto
+        for (idx, (offset_x, offset_y, width, height, range)) in enumerate(zip(offset_x_list, offset_y_list, width_list, height_list, range_list), 1):
+            draw.rectangle((offset_x, offset_y, offset_x+width, offset_y+height), fill=(0,0,0,125), outline=(255,255,255))
+            font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=max(range))
+            draw.text((offset_x + (width/2), offset_y + (height/4)), str(idx), font=font, fill=(255,255,255), stroke_width=3, stroke_fill='black')
+        return img
+
     def makeMeme(self, imageID, l_cadena):
-        imageOptions = self.configuration.get(imageID)
+        imageOptions = self.templates.get(imageID)["positionList"]
+        # print(f"makeMeme Options = {imageOptions}")
+
         if imageOptions is None:
             raise ValueError("imageID invalid")
-        return self.write_image(imageID, imageOptions[0], l_cadena, imageOptions[1], imageOptions[2], imageOptions[3], imageOptions[4], imageOptions[5], imageOptions[6])
+
+        width_list = []
+        height_list = []
+        offset_x_list = []
+        offset_y_list = []
+        range_list = []
+        spacing_list = []
+
+        for key in imageOptions:
+            width_list.append(key["width"])
+            height_list.append(key["height"])
+            offset_x_list.append(key["x"])
+            offset_y_list.append(key["y"])
+            range_list.append(key["sizeRange"])
+            spacing_list.append(key["lineSpacing"])
+        
+        return self.write_image(imageID=imageID, num_args=len(imageOptions), l_cadena=l_cadena, l_ancho=width_list, l_alto=height_list, l_offset_x=offset_x_list, l_offset_y=offset_y_list, l_rango=range_list, l_espaciado=spacing_list)
 
     def help(self):
-        str = """Uso del comando asumiendo que meme es el nombre del ejecutable:
-        meme IMAGEID [-o PATH] TEXTO1 [; TEXTO2; TEXTO3;...]
-Los diferentos textos deben ir separados por ';' con espacios por ambos lados. Si va como 'ejemplo;' o ';ejemplo' no sera detectada.
-Donde IMAGEID puede tomar los valores siguientes:
+        title = "Meme Generator Commands"
+        commands = ["info", "list", "create", "template"]
+        params = ["imageID", None, "imageID <strings>", "imageID"]
+        descriptions = ["Returns the number of strings that the imageID can take", "Returns the list of available imageIDs", "Creates a meme with the given imageID and the given strings, the strings must be separated by \';\'", "Returns a template of the given imageID"]
 
-        """
-        for i in self.images.keys():
-            str = str + i + ", "
-        str = str[:-2] + "\n"
+        return (title, commands, params, descriptions)
 
-        return str
-
-    def helpDiscord(self):
-        str = """Uso del comando asumiendo que meme es el nombre del ejecutable:
-        meme IMAGEID TEXTO1 [; TEXTO2; TEXTO3;...]
-Los diferentos textos deben ir separados por ';' con espacios por ambos lados. Si va como 'ejemplo;' o ';ejemplo' no sera detectada.
-Donde IMAGEID puede tomar los valores siguientes:
-
-        """
-        for i in self.images.keys():
-            str = str + i + ", "
-        str = str[:-2] + "\n"
-
-        return str
+    def listAvail(self):
+        # Todo make an embed
+        return ", ".join(self.templates.keys())
     
     def info(self,imageID):
-        arguments = self.configuration.get(imageID)
-        if arguments is None:
-            return "Thats not a imageID"
-        return "The number of strings is " + str(arguments[0])
+        imageOptions = self.templates.get(imageID)["positionList"]
+        
+        if imageOptions is None:
+            return "Thats not a valid imageID!"
+
+        return f"Format: `!meme create {imageID}{';'.join([f' str{i} ' for i in range(1, len(imageOptions)+1)])[:-1]}`"
     
     def saveMeme(self, imageID, l_cadena, path):
         img = self.makeMeme(imageID,l_cadena)
         img.save(path)
     
     def reload(self):
-        self.images = json.load(open(self.imagesPath))
-        self.configuration = json.load(open(self.configPath))
-        self.fonts = json.load(open(self.fontsPath)) 
+        self.__init__()
