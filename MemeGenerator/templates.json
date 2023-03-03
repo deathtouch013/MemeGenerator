@@ -602,7 +602,7 @@
                 "y": 961,
                 "sizeRange": [
                     10,
-                    250
+                    100
                 ],
                 "lineSpacing": 2
             },
@@ -613,7 +613,7 @@
                 "y": 938,
                 "sizeRange": [
                     10,
-                    250
+                    100
                 ],
                 "lineSpacing": 2
             },
@@ -624,7 +624,7 @@
                 "y": 914,
                 "sizeRange": [
                     10,
-                    250
+                    100
                 ],
                 "lineSpacing": 2
             }

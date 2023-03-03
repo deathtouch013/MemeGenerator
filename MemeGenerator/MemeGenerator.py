@@ -1,6 +1,5 @@
 import json
 from PIL import Image, ImageDraw, ImageFont
-import itertools
 import os
 import io
 import requests
@@ -36,7 +35,45 @@ class MemeGenerator:
         self.requests_session = requests.Session()
         self.requests_session.mount('meme://', LocalMemeAdapter())
 
+    def ComprobacionFitText(self, img, cadena, Font, ancho, alto):
+        try:
+            self.try_fit_text(img, cadena, Font, ancho, alto)
+        except:
+            return False
+        return True
+
+    def busquedaBinaria(self, rango, img, cadena, ancho, alto):
+        """Búsqueda binaria
+        Precondición: lista está ordenada
+        Devuelve -1 si x no está en lista;
+        Devuelve p tal que lista[p] == x, si x está en lista
+        """
+
+        izq = rango[0] # izq guarda el índice inicio del segmento
+        der = rango[1] # der guarda el índice fin del segmento
+
+        # un segmento es vacío cuando izq > der:
+        while izq <= der:
+            # el punto medio del segmento
+            medio = (izq+der)//2
+            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=medio)
+            if izq == der:
+                break
+            elif self.ComprobacionFitText(img, cadena, Font, ancho, alto):
+                izq = medio+1
+            else:
+                der = medio-1
+        if self.ComprobacionFitText(img, cadena, Font, ancho, alto):
+            return medio
+        else:
+            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=(medio-1))
+            if self.ComprobacionFitText(img, cadena, Font, ancho, alto) and ((medio-1) >= rango[0]):
+                return medio -1
+        # salió del ciclo de manera no exitosa: el valor no fue encontrado
+        return -1
+
     def break_fix(self, text, width, font, draw):
+        #TODO aplicar busqueda binaria
         if not text:
             return
         lo = 0
@@ -108,16 +145,11 @@ class MemeGenerator:
             raise ValueError("text doesn't fit")
 
     def write_text(self, img, cadena, ancho, alto, offset_x, offset_y, rango, espaciado):
-        #TODO optimizar con busqueda binaria
-        for size in range(rango[0], rango[1]):
-            Font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=size)
-            try:
-                self.try_fit_text(img, cadena, Font, ancho, alto)
-            except:
-                break
-                
-            selected_size = size
 
+        selected_size = self.busquedaBinaria(rango,img, cadena, ancho, alto)
+
+        if(selected_size == -1):
+            raise ValueError("text doesn't fit")
         arial = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=selected_size)
         self.fit_text(img, cadena, (255,255,255), arial, ancho, alto,  offset_x, offset_y, espaciado)
         return img
@@ -172,18 +204,13 @@ class MemeGenerator:
         img = Image.open(img_buf)
 
         num_args = len(imageOptions)
-        l_ancho = width_list
-        l_alto = height_list
-        l_offset_x = offset_x_list
-        l_offset_y = offset_y_list
-        l_rango = range_list
         
-        if num_args != len(l_ancho) or num_args != len(l_alto) or num_args != len(l_offset_x) or num_args != len(l_offset_y):
+        if num_args != len(width_list) or num_args != len(height_list) or num_args != len(offset_x_list) or num_args != len(offset_y_list):
             raise ValueError("All the list must have the same number of elements")
 
         draw = ImageDraw.Draw(img,'RGBA')
         # FIXME restar ancho del número / 2 para centrarlo en el offset correcto
-        for (idx, (offset_x, offset_y, width, height, range)) in enumerate(zip(l_offset_x, l_offset_y, l_ancho, l_alto, l_rango), 1):
+        for (idx, (offset_x, offset_y, width, height, range)) in enumerate(zip(offset_x_list, offset_y_list, width_list, height_list, range_list), 1):
             draw.rectangle((offset_x, offset_y, offset_x+width, offset_y+height), fill=(0,0,0,125), outline=(255,255,255))
             font = ImageFont.FreeTypeFont('./fonts/LiberationSans-Regular.ttf', size=max(range))
             draw.text((offset_x + (width/2), offset_y + (height/4)), str(idx), font=font, fill=(255,255,255), stroke_width=3, stroke_fill='black')
