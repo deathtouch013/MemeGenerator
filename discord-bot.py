@@ -60,6 +60,7 @@ async def on_ready():
 # event listener for a comand.
 @BOT.event
 async def on_message(message):
+    #TODO filtrar los mensajes de error de los try catch, que solo se manden los utiles para el usuario
     if message.author.bot:
         return
     mensaje = message.content.split()
@@ -114,7 +115,8 @@ async def on_message(message):
             try:
                 img = meme.makeMeme(mensaje[2],strings)
             except Exception as e:
-                await message.channel.send(e)
+                if e == 'imageID invalid':
+                    await message.channel.send(e)
                 return
             with io.BytesIO() as image_binary:
                 img.save(image_binary, 'PNG')
