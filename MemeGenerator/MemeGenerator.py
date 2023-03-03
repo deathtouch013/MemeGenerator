@@ -73,6 +73,7 @@ class MemeGenerator:
         return -1
 
     def break_fix(self, text, width, font, draw):
+        #TODO aplicar busqueda binaria
         if not text:
             return
         lo = 0
